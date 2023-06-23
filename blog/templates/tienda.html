@@ -1,0 +1,149 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block content %}
+<script>
+    $(function(){
+        $("#title_prod").css("color", "#e83e8c").css("text-align", "center").css("margin-top", "15px");
+    })
+</script>
+<div class="col-12 prueba">
+</div>
+
+  <div class="container">
+    <div class="row">
+      {% for producto in productos %}
+        <div class="col-12 col-md-4">
+            <h2>{{producto.nombre}}</h2>
+            <a href="#">
+                <img src="{{producto.img.url}}" style="width: 350px; height: 420px;"/>
+            </a>
+            <input type="submit"  hidden class="col-12 vervalor" value="1"/>
+            <input type="submit"  hidden class="col-12 verid" value="utn_{{producto.id}}"/>
+            <button type="button" class="agregar" name="agregar">{{producto.id}}Agregar</button>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script> 
+    <script>
+        /*jslint browser: true*/
+        /*jslint plusplus: true*/
+        /*global FormData: false */
+        /*global $, jQuery, alert, console*/
+        /*..............................................................................................
+        ... PARA VALIDAR LOS DATOS .....................................................
+        .............................................................................................*/
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            "use strict";
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        };
+
+        //
+
+        function AgregarI(cada_producto_id, valor) {
+            "use strict";
+
+            console.log(cada_producto_id, valor);
+            $.ajax({
+                beforeSend : function (xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                },
+                url : "/tienda/agregar/",
+                type : "GET",
+                data : { cada_producto_id:cada_producto_id, valor:valor},
+                //try
+                success : function (json) { 
+                    console.log(json[0].idproducto.toString())
+                    console.log(json[0].cantida.toString())
+                    localStorage.setItem(json[0].idproducto.toString(), json[0].cantida.toString());
+                    //location.reload();
+                    console.log("ok++++++++++++++++++++++++")
+                },
+                //except
+                error : function (xhr, errmsg, err) {
+                    console.log('Error en carga de respuesta');
+                }
+            });
+        } 
+
+        //
+
+        $('.agregar').click( 
+            function (event) {
+                "use strict";
+                event.preventDefault();              
+                let cada_producto_id= $(this).parent().find('.verid').val();
+                let valor=$(this).parent().find('.vervalor').val();
+                console.log(cada_producto_id);
+                console.log(valor);
+
+                console.log(localStorage.setItem("lucas", "prueba")); //elemento de prueba para eliminar
+                //Limpiar localStorage
+                //console.log(localStorage.setItem(cada_producto_id, valor)); //linea que agrega manualmente los datos ROMPE EL FUNCIONAMIENTO DE AGREGAR EN VIEWS PY
+                console.log(JSON.stringify(localStorage));
+
+
+                let i;
+
+                for(i = 0; i < localStorage.length; i++){
+                    let clave_eliminar = localStorage.key(i);
+                    console.log(typeof clave_eliminar);
+                    console.log(clave_eliminar);
+                    if(!clave_eliminar.startsWith("utn_")){
+                        console.log("retorna NO verdadero !!!!!!!!!!!!!");
+                        localStorage.removeItem(clave_eliminar);
+                        console.log("retorna NO verdadero !!!!!!!!!!!!!");
+                    }
+                }
+
+
+
+                for(i = 0; i < localStorage.length; i++){
+                    let clave = localStorage.key(i);
+                    let el_valor = localStorage[clave];
+                    if(clave == cada_producto_id){
+                        console.log("-----1112------")
+                        console.log(clave);
+                        console.log(valor);
+                        valor = el_valor;
+                        console.log("-----1112------")
+                        print(el_valor)
+                    }else{
+                        console.log("no hay coincidencia, entro al else");
+                    }   
+                }
+                
+                AgregarI(cada_producto_id, valor);
+        }
+        );
+        
+    </script>
+{% endblock  %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script> 
+    <script>
+        let saludo = "PRUEBAAAAAA";
+        console.log(saludo);
+    </script>
+    <script>
+        /*jslint browser: true*/
+        /*jslint plusplus: true*/
+        /*global FormData: false */
+        /*global $, jQuery, alert, console*/
+        /*..............................................................................................
+        ... PARA VALIDAR LOS DATOS .....................................................
+        .............................................................................................*/
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            "use strict";
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        };
+ 
+    </script>
+{% endblock scripts %}

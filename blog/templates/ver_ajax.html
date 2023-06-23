@@ -1,0 +1,80 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block content %}
+<script>
+    $(function(){
+        $("#title_prod").css("color", "#e83e8c").css("text-align", "center").css("margin-top", "15px");
+    })
+</script>
+<div class="col-12 prueba">
+    <section id="todos_los_productos" class ="row" >
+        <h2>Seleccionar producto</h2>
+        <hr/>
+        <div id="contenedor_filtros" class="row">
+           <div id="filtros_productos"  class="col-xs-12">
+               <form id="searchr-form"   action="" method="post" >{% csrf_token  %}
+                   <div class="campo_busqueda col-xs-12 "  >
+                       {{ search }}
+                       <br><br><br>
+                       <input type="button" id="boton_prod" value="Ver datos" style="margin: auto;"/>
+                   </div>
+                </form>
+           </div>
+        </div>
+        <div id="contenedor_filtrado" class="col-xs-10 col-sm-offset-2 col-sm-8  
+                                          col-md-offset-4 col-md-4 "></div>
+    </section>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+<script type="text/javascript" src="{% static 'assets/js/ajax.js' %}"></script>
+<script type="text/javascript" src="{% static 'assets/js/jquery-ui.min.js' %}"></script>
+
+
+<script type="text/javascript">
+    $( "#id_querycom" ).autocomplete({source:"/tienda/buscar_bebida/"
+     }); 
+</script>
+
+<script type="text/javascript">
+    var csrftoken = $.cookie('csrftoken');
+    function csrfSafeMethod(method){
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+/*..............................................................................................
+... TODOS LOS CURSOS .............................................................
+............................................................................................. */
+$( "#boton_prod" ).click(function(){
+	valor = $( "#id_querycom" ).val();
+	respuestproducto(valor)
+});
+function respuestproducto(valor){
+    $.ajax({
+        beforeSend : function(xhr, settings){
+			if(!csrfSafeMethod(settings.type) && !this.crossDomain){
+				xhr.setRequestHeader("X-CSRFToken", csrftoken);
+			}
+		},
+		url : "/tienda/buscar_bebida2/",
+		type : "GET",
+		data : { valor : valor,},
+		success : function(json){
+            valor_retornado = "<h2 style='text-align:center;'>"+json[0].producto+"</h2>"+ "<img style='width:100%;' src='/public/" + json[0].ruta_imagen +"/ '/>"
+            $('#contenedor_filtrado').html(valor_retornado);
+            console.log(json[0].producto);
+		},
+		error : function(xhr, errmsg, err){
+			console.log('Error en carga de respuesta');
+		},
+    });
+}
+</script>
+
+{% endblock  %}
+
